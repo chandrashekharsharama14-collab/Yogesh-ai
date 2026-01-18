@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Yogesh AI Portal",
+  "description": "A futuristic AI companion named Yogesh capable of 3D image generation, coding, and general conversation with a personalized Hindi interface.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
