@@ -12,64 +12,192 @@
     <style>
         :root {
             --primary: #38bdf8;
-            --secondary: #818cf8;
-            --accent: #f472b6;
+            --accent: #818cf8;
+            --bg-dark: #020617;
         }
+
         body {
             font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
-            background: #020617;
+            background: var(--bg-dark);
             background-image: 
-                radial-gradient(at 0% 0%, hsla(215, 98%, 61%, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, hsla(270, 98%, 61%, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, hsla(180, 98%, 61%, 0.05) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, hsla(215, 98%, 61%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(270, 98%, 61%, 0.1) 0px, transparent 50%);
             color: white;
+            margin: 0;
             overflow-x: hidden;
             min-height: 100vh;
         }
+
         .orbitron { font-family: 'Orbitron', sans-serif; }
+
         .glass {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
+
         .glow-text {
-            text-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.8);
         }
-        .animate-logo {
-            animation: rotate3D 8s linear infinite;
+
+        /* 3D Animated Logo */
+        .logo-container {
+            perspective: 1000px;
+        }
+
+        .logo-3d {
+            width: 100px;
+            height: 100px;
+            position: relative;
             transform-style: preserve-3d;
+            animation: rotate3d 8s infinite linear;
         }
-        @keyframes rotate3D {
-            0% { transform: rotateY(0deg) rotateX(0deg); }
-            50% { transform: rotateY(180deg) rotateX(10deg); }
-            100% { transform: rotateY(360deg) rotateX(0deg); }
+
+        .logo-face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.5);
         }
-        .message-in {
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+        .front  { transform: translateZ(50px); }
+        .back   { transform: rotateY(180deg) translateZ(50px); }
+        .left   { transform: rotateY(-90deg) translateZ(50px); }
+        .right  { transform: rotateY(90deg) translateZ(50px); }
+        .top    { transform: rotateX(90deg) translateZ(50px); }
+        .bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+        @keyframes rotate3d {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg); }
         }
+
+        /* Message Animations */
+        .message {
+            animation: slideUp 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        ::-webkit-scrollbar { width: 5px; }
+
+        .loading-dots span {
+            animation: bounce 1.4s infinite ease-in-out both;
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin: 0 2px;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 10px; }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
-  }
-}
-</script>
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.sh/@google/genai"
+      }
+    }
+    </script>
 </head>
-<body>
-    <div id="root"></div>
+<body class="p-4 md:p-8">
+    <div id="app" class="max-w-5xl mx-auto flex flex-col min-h-[90vh]">
+        <!-- Header -->
+        <header class="flex flex-col items-center mb-12">
+            <div class="logo-container mb-6">
+                <div class="logo-3d">
+                    <div class="logo-face front"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                    <div class="logo-face back"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                    <div class="logo-face left"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                    <div class="logo-face right"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                    <div class="logo-face top"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                    <div class="logo-face bottom"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                </div>
+            </div>
+            <h1 class="text-4xl md:text-7xl font-black orbitron glow-text text-white tracking-tighter mb-4 uppercase">
+                YOGESH <span class="text-sky-500">AI</span>
+            </h1>
+            <div class="px-6 py-2 glass rounded-full flex items-center gap-3">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></span>
+                <p class="text-[10px] font-black uppercase tracking-[0.4em] text-sky-400">Systems Online / v7.2 Stable</p>
+            </div>
+        </header>
+
+        <!-- Main Portal -->
+        <div class="flex-1 glass rounded-[3rem] overflow-hidden flex flex-col relative border border-white/5 shadow-2xl">
+            <!-- Mode Selector -->
+            <div class="p-6 border-b border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 z-10 bg-white/5">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 glass rounded-2xl flex items-center justify-center border-sky-500/30">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-black orbitron tracking-widest text-white">CORE INTERFACE</h2>
+                        <p class="text-[9px] font-bold text-sky-500/60 uppercase">Processing via Gemini 3 Flash</p>
+                    </div>
+                </div>
+                
+                <div class="flex bg-black/40 p-1.5 rounded-2xl border border-white/10">
+                    <button id="chat-mode-btn" class="px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all bg-sky-600 text-white shadow-lg">चैटिंग</button>
+                    <button id="image-mode-btn" class="px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-gray-500 hover:text-white">3D इमेज</button>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div id="chat-box" class="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 min-h-[400px]">
+                <!-- Messages will appear here via JS -->
+            </div>
+
+            <!-- Input Bar -->
+            <div class="p-8 border-t border-white/5 bg-black/20">
+                <div class="max-w-4xl mx-auto flex gap-4">
+                    <div class="flex-1 relative">
+                        <input type="text" id="user-input" placeholder="योगेश से पूछें..." 
+                            class="w-full bg-black/60 border-2 border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-sky-500 transition-all text-white pr-14 shadow-inner placeholder-gray-600">
+                        <div class="absolute right-5 top-1/2 -translate-y-1/2 text-sky-500/40">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12L2.7 7.3"/><path d="M12 12V21.8"/><path d="M12 12L21.3 7.3"/></svg>
+                        </div>
+                    </div>
+                    <button id="send-btn" class="bg-sky-600 hover:bg-sky-500 text-white p-4 px-8 rounded-2xl transition-all shadow-xl active:scale-95 disabled:opacity-50">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Founder Branding Footer -->
+        <footer class="py-20 flex flex-col items-center">
+            <div class="w-32 h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent mb-12 opacity-30"></div>
+            <div class="text-center group cursor-default">
+                <h4 class="text-[12px] font-black tracking-[0.8em] text-gray-600 uppercase mb-4 opacity-50">Masterminds behind the Project</h4>
+                <h3 class="text-5xl md:text-9xl font-black orbitron text-white tracking-tighter transition-all group-hover:scale-105 duration-700">
+                    FOUNDER <span class="text-transparent bg-clip-text bg-gradient-to-br from-white via-sky-400 to-blue-900 drop-shadow-[0_0_30px_rgba(56,189,248,0.3)]">YOGESH</span>
+                </h3>
+            </div>
+            <p class="mt-16 text-[10px] font-black text-gray-800 uppercase tracking-[0.6em]">© 2024 Yogesh Dynamics • All Systems Secure</p>
+        </footer>
+    </div>
+
+    <script type="module" src="index.js"></script>
 </body>
 </html>
